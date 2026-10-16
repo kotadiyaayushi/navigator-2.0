@@ -1,7 +1,9 @@
+import 'package:expense_tracker_app/ui/add_transaction/add_transaction_screen.dart';
 import 'package:expense_tracker_app/ui/detail/detail_screen.dart';
 import 'package:expense_tracker_app/ui/home/home_screen.dart';
 import 'package:expense_tracker_app/ui/routing/navigation_stack_item.dart';
 import 'package:expense_tracker_app/ui/routing/navigation_stack_keys.dart';
+import 'package:expense_tracker_app/ui/routing/slide_up_page.dart';
 import 'package:expense_tracker_app/ui/routing/stack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final globalNavigatorKey = GlobalKey<NavigatorState>();
 
-class MainRouterDelegate extends RouterDelegate<NavigationStack>
-with ChangeNotifier, PopNavigatorRouterDelegateMixin{
+class MainRouterDelegate extends RouterDelegate<NavigationStack> with ChangeNotifier, PopNavigatorRouterDelegateMixin{
   final NavigationStack stack;
   MainRouterDelegate(this.stack){
     stack.addListener(notifyListeners);
@@ -63,11 +64,36 @@ with ChangeNotifier, PopNavigatorRouterDelegateMixin{
             key: ValueKey('${NavigationStackKeyMapper.key(item)}_$index'),
               child: HomeScreen(stack: stack));
         },
-        detail: (){
-          return MaterialPage(
-            key: ValueKey('${NavigationStackKeyMapper.key(item)}_$index'),
-              child: DetailScreen());
-        });
+      detail: (expense) {
+        return MaterialPage(
+          name: '/detail/${expense.id}',
+          key: ValueKey(
+            '${NavigationStackKeyMapper.key(item)}_$index',
+          ),
+          child: DetailScreen(
+            expense: expense,
+            stack: stack,
+          ),
+        );
+      },
+      addTransaction: (expense) {
+        return SlideUpPage(
+          key: ValueKey(
+            '${NavigationStackKeyMapper.key(item)}_$index',
+          ),
+          name: expense == null ? '/add' : '/edit/${expense.id}',
+          child: AddTransactionScreen(
+            expense: expense,
+            onClose: () {
+              if (stack.items.length > 1) {
+                stack.pop();
+              }
+            },
+          ),
+        );
+      },
+    );
+
   }
 
   @override
@@ -75,13 +101,10 @@ with ChangeNotifier, PopNavigatorRouterDelegateMixin{
   NavigationStack get currentConfiguration{
     return stack;
   }
-
   @override
-  Future<void> setNewRoutePath(NavigationStack configuration)async{
-    // TODO: implement setNewRoutePath
-
+  Future<void> setNewRoutePath(NavigationStack configuration) async {
     stack.items = configuration.items;
-
+    notifyListeners();
   }
 
   @override

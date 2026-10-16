@@ -19,8 +19,14 @@ class NavigationStackKeyMapper{
           return 'home';
         },
 
-        detail: (){
+        detail: (expense){
           return 'detail';
-        });
+        },
+
+      addTransaction: (expense){
+          return 'add';
+      }
+
+    );
   }
 }

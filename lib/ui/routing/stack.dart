@@ -4,8 +4,7 @@ import 'package:expense_tracker_app/ui/routing/navigation_stack_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-final navigationStackController = ChangeNotifierProvider(
-    (ref){
+final navigationStackController = ChangeNotifierProvider((ref){
       return NavigationStack([NavigationStackItem.home()]);
     }
 );
